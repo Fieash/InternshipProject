@@ -31,10 +31,9 @@
 #define PS_THREAD       0x00000002
 #define PS_MORE         0x00000004
 
-int brutesimplecheck ;
 int  checkps(int tmppid, int checks) ;
 void printbadpid (int tmppid) ;
-void brute(int maxpid, int brutesimplecheck);
+void brute(int maxpid, int check);
 char * find_hidden_process_name(int hiddenPID);
 long int findSize(char file_name[]);
 
@@ -42,7 +41,7 @@ long int findSize(char file_name[]);
  *  Brute force the pid space via vfork. All PIDs which
  *  can't be obtained are checked against ps output
  */
-void brute(int maxpid, int brutesimplecheck) 
+void brute(int maxpid, int check) 
 {
     int i=0;
     int allpids[maxpid] ;
@@ -86,7 +85,7 @@ void brute(int maxpid, int brutesimplecheck)
         }
     }
 
-    if(0 == brutesimplecheck)   // Do the scan a second time
+    if(0 == check)   // Do the scan a second time
     {
     //    printf("DOING double check ...\n") ;
         for (i=301; i < maxpid; i++) 
@@ -108,10 +107,9 @@ void brute(int maxpid, int brutesimplecheck)
         }
     }
    /* processes that quit at this point in time create false positives */
-
    for(y=0; y < maxpid; y++) 
    {
-        if ((allpids[y] != 0) && ((0 == brutesimplecheck) || (allpids2[y] != 0))) 
+        if ((allpids[y] != 0) && ((0 == check) || (allpids2[y] != 0))) 
         {
             //printf("Check PID : %d\n", y);
             if(!checkps(allpids[y],PS_PROC | PS_THREAD | PS_MORE) ) 
@@ -121,13 +119,14 @@ void brute(int maxpid, int brutesimplecheck)
         }
    }
 
-   
 }
 
 int main(int argc, char *argv[])
 {
-	printf("==== rootkit detection start (3test.c)\n");
-    // 0 for a second check
+	printf("==== rootkit detection start (hidden_process_detection.c)\n");
+    // first parameter should be your system's max PID, 
+	// found at /proc/sys/kernel/pid_max
+	// 0 for a second check (leave it as 0)
 	brute(131072, 0);
 	
 	return 0;
@@ -140,7 +139,7 @@ void printbadpid(int badPid)
 	if(processName != "fail" && processName != "nonExist"){
 		printf("suspicious PID %d: %s\n", badPid, processName);
 	}else{
-		printf("process name is %s", processName);
+		//printf("process name is %s", processName); //debug
 	}
 		
 }
