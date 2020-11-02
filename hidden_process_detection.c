@@ -37,6 +37,16 @@ void brute(int maxpid, int check);
 char * find_hidden_process_name(int hiddenPID);
 long int findSize(char file_name[]);
 
+int main(int argc, char *argv[])
+{
+	printf("==== rootkit detection start (hidden_process_detection.c)\n");
+    // first parameter should be your system's max PID, 
+	// found at /proc/sys/kernel/pid_max
+	// 0 for a second check (leave it as 0)
+	brute(131072, 0);
+	return 0;
+}
+
 /*
  *  Brute force the pid space via vfork. All PIDs which
  *  can't be obtained are checked against ps output
@@ -119,17 +129,6 @@ void brute(int maxpid, int check)
         }
    }
 
-}
-
-int main(int argc, char *argv[])
-{
-	printf("==== rootkit detection start (hidden_process_detection.c)\n");
-    // first parameter should be your system's max PID, 
-	// found at /proc/sys/kernel/pid_max
-	// 0 for a second check (leave it as 0)
-	brute(131072, 0);
-	
-	return 0;
 }
 
 void printbadpid(int badPid)
