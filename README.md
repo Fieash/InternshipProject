@@ -22,8 +22,8 @@ With syscall_detection.c, we can also detect syscalls that are being hidden from
 ```
 git clone https://github.com/Fieash/InternshipProject.git
 make
-sudo insmod main.ko
-sudo rmmod main.ko
+sudo insmod module_detection.ko
+sudo rmmod module_detection.ko
 dmesg 
 ```
 An alternative to watch the output is to use tail -f /var/log/syslog
@@ -45,7 +45,7 @@ the /proc/sys/kernel/pid_max file.
 ```
 Then compile it as a regular C program and run it with sudo.
 ```
-gcc hidden_process_detection.c
+gcc process_detection.c
 sudo ./a.out
 ```
 
