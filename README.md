@@ -17,11 +17,13 @@ With syscall_detection.c, we can also detect syscalls that are being hidden from
 
 
 ## Installation
-
-### Hidden module detection
 ```
 git clone https://github.com/Fieash/InternshipProject.git
 make
+```
+
+### Hidden module detection
+```
 sudo insmod module_detection.ko
 sudo rmmod module_detection.ko
 dmesg 
@@ -51,7 +53,6 @@ sudo ./a.out
 
 ### Syscall hook detection
 ```
-make
 sudo insmod syscall_detection.ko
 sudo rmmod syscall_detection.ko
 dmesg
