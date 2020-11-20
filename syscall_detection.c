@@ -30,7 +30,7 @@ static void __exit syscalls_exit(void)
 }
 
 
-// Determine modules in the syscall table that aren't within the core kernel text section
+// Detect modules in the syscall table that aren't within the core kernel text section
 void analyze_syscalls(void){
 	int i;
 	const char *mod_name;
