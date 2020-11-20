@@ -1,4 +1,4 @@
-obj-m += main.o 
+obj-m += module_detection.o 
 obj-m += syscall_detection.o 
 
 all: 
