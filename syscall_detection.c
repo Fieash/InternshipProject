@@ -2,7 +2,7 @@
 #include <linux/module.h>
 #include <linux/version.h>
 #include <linux/kallsyms.h>
-#include <asm/asm-offsets.h> /* NR_syscalls */
+#include <asm/asm-offsets.h> // to use NR_syscalls (number of system calls)
 
 
 #define BETWEEN_PTR(x, y, z) ( \
@@ -30,14 +30,15 @@ static void __exit syscalls_exit(void)
 }
 
 
+// Determine modules in the syscall table that aren't within the core kernel text section
 void analyze_syscalls(void){
 	int i;
 	const char *mod_name;
 	unsigned long addr;
 	struct module *mod;
 
-    unsigned long *sct; /* Syscall Table */
-    int (*ckt)(unsigned long addr); /* Core Kernel Text */
+    unsigned long *sct; 			// Syscall Table
+    int (*ckt)(unsigned long addr); // Core Kernel Text
 
 	sct = (void *)kallsyms_lookup_name("sys_call_table");
 	ckt = (void *)kallsyms_lookup_name("core_kernel_text");
@@ -63,6 +64,7 @@ void analyze_syscalls(void){
 }
 
 
+// Used by analyze_syscalls() to return the name of the hidden module given their address
 const char *find_hidden_module(unsigned long addr){
 	const char *mod_name = NULL;
 	struct kset *mod_kset;
