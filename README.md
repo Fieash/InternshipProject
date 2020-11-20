@@ -10,8 +10,10 @@ It is currently able to detect the reptile module when it is hiding from the sys
 The method of detection is adapted from the Tyton rootkit hunter. 
 https://github.com/nbulischeck/tyton
 
-With hidden_process_detection.c we are now also able to detect processes that are
+With hidden_process_detection.c, we are able to detect processes that are
 attempting to hide from the system.
+
+With syscall_detection.c, we can also detect syscalls that are being hidden from the system.
 
 
 ## Installation
@@ -26,7 +28,7 @@ dmesg
 ```
 An alternative to watch the output is to use tail -f /var/log/syslog
 
-### Hidden process Detection
+### Hidden process detection
 
 At line 46, modify the program according to your system's max PID found in 
 the /proc/sys/kernel/pid_max file.
@@ -45,4 +47,12 @@ Then compile it as a regular C program and run it with sudo.
 ```
 gcc hidden_process_detection.c
 sudo ./a.out
+```
+
+### Syscall hook detection
+```
+make
+sudo insmod syscall_detection.ko
+sudo rmmod syscall_detection.ko
+dmesg
 ```

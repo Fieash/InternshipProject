@@ -7,7 +7,7 @@
 
 // declare functions here
 void analyze_modules(void);
-extern unsigned long lookup_name(const char *);
+//extern unsigned long lookup_name(const char *);
 
 static int __init test_3_init(void)
 {
