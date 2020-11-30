@@ -57,11 +57,11 @@ void analyze_syscalls(void){
 			mutex_lock(&module_mutex);
 			mod = __module_address(addr);
 			if (mod){
-				printk(KERN_ALERT "Module [%s] hooked syscall [%d].\n", mod->name, i);
+				printk(KERN_ALERT "Module [%s] hooked syscall [%d].\n", mod->name, syscall_names[i]);
 			} else {
 				mod_name = find_hidden_module(addr);
 				if (mod_name)
-					printk(KERN_ALERT "Hidden module [%s] hooked syscall [%d].\n", mod_name, i);
+					printk(KERN_ALERT "Hidden module [%s] hooked syscall [%d].\n", mod_name, syscall_names[i]);
 			}
 			mutex_unlock(&module_mutex);
 		}
