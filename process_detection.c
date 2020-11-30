@@ -39,11 +39,12 @@ long int findSize(char file_name[]);
 
 int main(int argc, char *argv[])
 {
-	printf("==== rootkit detection start (hidden_process_detection.c)\n");
+	printf("==== Start hidden process detection app.\n");
     // first parameter should be your system's max PID, 
 	// found at /proc/sys/kernel/pid_max
 	// 0 for a second check (leave it as 0)
 	brute(131072, 0);
+	printf("==== Exit hidden process detection app.\n");
 	return 0;
 }
 
@@ -60,7 +61,7 @@ void brute(int maxpid, int check)
     int y;
     int z;
 
-    printf("==== brute force PID scan with fork() range 301 to %d\n\n", maxpid);
+    printf("==== Brute force PID scan with fork() range 301 to %d\n\n", maxpid);
 
     // PID under 301 are reserved for kernel
 	// fill them up with zeros
@@ -136,7 +137,7 @@ void printbadpid(int badPid)
 	char * processName = "err";
 	processName = find_hidden_process_name(badPid);
 	if(processName != "fail" && processName != "nonExist"){
-		printf("suspicious PID %d: %s\n", badPid, processName);
+		printf("Suspicious PID %d: %s\n", badPid, processName);
 	}else{
 		//printf("process name is %s", processName); //debug
 	}

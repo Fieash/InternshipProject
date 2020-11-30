@@ -11,14 +11,14 @@ void analyze_modules(void);
 
 static int __init test_3_init(void)
 {
-    printk(KERN_INFO "==== Start detection app.\n");
+    printk(KERN_INFO "==== Start module detection app.\n");
     analyze_modules();
     return 0;
 }
 
 static void __exit test_3_exit(void)
 {
-    printk(KERN_INFO "==== Exit detection app.\n");
+    printk(KERN_INFO "==== Exit module detection app.\n");
 }
 
 void analyze_modules(void){
