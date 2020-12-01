@@ -26,8 +26,6 @@ void analyze_modules(void){
 	struct kobject *cur, *tmp;
 	struct module_kobject *kobj;
 
-	printk(KERN_INFO "Analyzing Module List\n");
-
 	mod_kset = (void *)kallsyms_lookup_name("module_kset");
 	if (!mod_kset)
 		return;

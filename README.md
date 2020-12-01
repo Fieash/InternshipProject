@@ -13,7 +13,8 @@ https://github.com/nbulischeck/tyton
 With hidden_process_detection.c, we are able to detect processes that are
 attempting to hide from the system.
 
-With syscall_detection.c, we can also detect syscalls that are being hidden from the system.
+With syscall_detection.c, we can also detect syscalls that are being hidden from the system,
+displaying their names and numbers in the output.
 
 
 ## Installation
