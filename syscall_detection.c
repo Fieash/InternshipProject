@@ -4,6 +4,7 @@
 #include <linux/kallsyms.h>
 #include <asm/asm-offsets.h> // to use NR_syscalls (number of system calls)
 
+#define TOTAL_INTERRUPTS 256;
 
 #define BETWEEN_PTR(x, y, z) ( \
 	((uintptr_t)x >= (uintptr_t)y) && \
@@ -17,12 +18,14 @@ const char* syscall_names[] = {"read", "write", "open", "close", "stat", "fstat"
 
 // declare functions here
 void analyze_syscalls(void);
+void analyze_interrupts(void);
 const char *find_hidden_module(unsigned long addr);
 
 
 static int __init syscalls_init(void)
 {
     printk(KERN_INFO "==== Start syscall detection app.\n");
+	analyze_interrupts();
     analyze_syscalls();
     return 0;
 }
@@ -50,6 +53,8 @@ void analyze_syscalls(void){
 	if (!sct || !ckt)
 		return;
 
+	printk(KERN_ALERT "SYSCALL START\n";
+
 	for (i = 0; i < NR_syscalls; i++){
 		addr = sct[i];
 		if (!ckt(addr)){
@@ -65,6 +70,46 @@ void analyze_syscalls(void){
 			mutex_unlock(&module_mutex);
 		}
 	}
+
+	printk(KERN_ALERT "SYSCALL END\n";
+}
+
+
+// Detect interrupt handlers in the interrupt discriptor table that aren't within the core kernel text section
+void analyze_interrupts(void){
+	int i;
+	const char *mod_name;
+	unsigned long addr;
+	struct module *mod;
+
+    unsigned long *idt; 			// Interrupt Discriptor Table
+    int (*ckt)(unsigned long addr); // Core Kernel Text
+
+	idt = (void *)kallsyms_lookup_name("idt_table");
+	ckt = (void *)kallsyms_lookup_name("core_kernel_text");
+
+	if (!idt || !ckt)
+		return;
+
+	printk(KERN_ALERT "INTERRUPT START\n";
+
+	for (i = 0; i < TOTAL_INTERRUPTS; i++){
+		addr = idt[i];
+		if (!ckt(addr)){
+			mutex_lock(&module_mutex);
+			mod = __module_address(addr);
+			if (mod){
+				printk(KERN_ALERT "Module [%s] hooked interrupt [%d].\n", mod->name, i);
+			} else {
+				mod_name = find_hidden_module(addr);
+				if (mod_name)
+					printk(KERN_ALERT "Hidden module [%s] hooked interrupt [%d].\n", mod_name, i);
+			}
+			mutex_unlock(&module_mutex);
+		}
+	}
+
+	printk(KERN_ALERT "INTERRUPT END\n";
 }
 
 
