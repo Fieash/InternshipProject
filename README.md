@@ -2,6 +2,7 @@
 
 Rootkit detection program targeted at detecting Reptile rootkit by f0rb1dd3n
 https://github.com/f0rb1dd3n/Reptile and Diamoprhine rootkit by wazuh https://github.com/wazuh/Diamorphine.
+This tool was developed for educational purposes.
 
 ## Features
 - Hidden module detection (module_detection.c)
@@ -13,6 +14,8 @@ module_detection.c, syscall_detection.c and interrupt_detection.c are Loadable K
 that outputs their results to the system log. They can be read using the dmesg command.
 
 hidden_process_detection.c is a C program that outputs hidden PIDs to the console.
+
+The detection methods are adapted from the Tyton rootkit hunter https://github.com/nbulischeck/tyton.
 
 ## Installation
 ```
@@ -65,11 +68,9 @@ dmesg
 ## Detection Results
 
 ### Reptile
-It is able to detect the reptile module when it is hiding from the system
-The method of detection is adapted from the Tyton rootkit hunter. 
-https://github.com/nbulischeck/tyton
-
+It is able to detect the reptile module when it is hiding from the system,
+as well as processes hidden by Reptile.
 
 ### Diamorphine
 It is able to detect the diamorphine module as well as the system calls
-that Diamorphine hooks, which are kill, getdents, and getdents64.
+that Diamorphine hooks, which are kill, getdents, and getdents64. 
