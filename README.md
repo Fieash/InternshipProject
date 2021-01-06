@@ -1,10 +1,10 @@
 # InternshipProject
 
 Rootkit detection program targeted at detecting Reptile rootkit by f0rb1dd3n
-https://github.com/f0rb1dd3n/Reptile
+https://github.com/f0rb1dd3n/Reptile and Diamoprhine rootkit by wazuh https://github.com/wazuh/Diamorphine.
 
-The Main.c program is a Loadable Kernel Module that outputs the results to the system log,
-and hidden_process_detection.c is a C program that outputs the hiding PIDs to the console.
+main.c program is a Loadable Kernel Module that outputs the results to the system log,
+and hidden_process_detection.c is a C program that outputs hidden PIDs to the console.
 
 It is currently able to detect the reptile module when it is hiding from the system
 The method of detection is adapted from the Tyton rootkit hunter. 
@@ -13,8 +13,10 @@ https://github.com/nbulischeck/tyton
 With hidden_process_detection.c, we are able to detect processes that are
 attempting to hide from the system.
 
-With syscall_detection.c, we can also detect syscalls that are being hidden from the system,
+syscall_detection.c is a Loadable Kernel Module that detects syscalls that have been hooked,
 displaying their names and numbers in the output.
+
+interrupt_detection.c is a Loadable Kernel Module that detects interrupts that have been hooked.
 
 
 ## Installation
@@ -56,5 +58,12 @@ sudo ./a.out
 ```
 sudo insmod syscall_detection.ko
 sudo rmmod syscall_detection.ko
+dmesg
+```
+
+### Interrupt hook detection
+```
+sudo insmod interrupt_detection.ko
+sudo rmmod interrupt_detection.ko
 dmesg
 ```
