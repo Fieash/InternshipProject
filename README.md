@@ -14,17 +14,6 @@ that outputs their results to the system log. They can be read using the dmesg c
 
 hidden_process_detection.c is a C program that outputs hidden PIDs to the console.
 
-## Detecting Reptile
-It is able to detect the reptile module when it is hiding from the system
-The method of detection is adapted from the Tyton rootkit hunter. 
-https://github.com/nbulischeck/tyton
-
-
-## Detecting Diamorphine
-It is able to detect the diamorphine module as well as the system calls
-that Diamorphine hooks, which are kill, getdents, and getdents64.
-
-
 ## Installation
 ```
 git clone https://github.com/Fieash/InternshipProject.git
@@ -72,3 +61,15 @@ sudo insmod interrupt_detection.ko
 sudo rmmod interrupt_detection.ko
 dmesg
 ```
+
+## Detection Results
+
+### Reptile
+It is able to detect the reptile module when it is hiding from the system
+The method of detection is adapted from the Tyton rootkit hunter. 
+https://github.com/nbulischeck/tyton
+
+
+### Diamorphine
+It is able to detect the diamorphine module as well as the system calls
+that Diamorphine hooks, which are kill, getdents, and getdents64.
