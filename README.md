@@ -3,29 +3,38 @@
 Rootkit detection program targeted at detecting Reptile rootkit by f0rb1dd3n
 https://github.com/f0rb1dd3n/Reptile and Diamoprhine rootkit by wazuh https://github.com/wazuh/Diamorphine.
 
-main.c program is a Loadable Kernel Module that outputs the results to the system log,
-and hidden_process_detection.c is a C program that outputs hidden PIDs to the console.
+## Features
+- Hidden module detection
+- Hidden process detection
+- System call hook detection
+- Interrupt hook detection
 
-It is currently able to detect the reptile module when it is hiding from the system
+## Detecting Reptile
+It is able to detect the reptile module when it is hiding from the system
 The method of detection is adapted from the Tyton rootkit hunter. 
 https://github.com/nbulischeck/tyton
 
-With hidden_process_detection.c, we are able to detect processes that are
-attempting to hide from the system.
 
-syscall_detection.c is a Loadable Kernel Module that detects syscalls that have been hooked,
-displaying their names and numbers in the output.
-
-interrupt_detection.c is a Loadable Kernel Module that detects interrupts that have been hooked.
+## Detecting Diamorphine
+It is able to detect the diamorphine module as well as the system calls
+that Diamorphine hooks, which are kill, getdents, and getdents64.
 
 
 ## Installation
+
+module_detection.c, syscall_detection.c and interrupt_detection.c are Loadable Kernel Modules 
+that outputs their results to the system log. They can be read using the dmesg command.
+
+hidden_process_detection.c is a C program that outputs hidden PIDs to the console.
+
 ```
 git clone https://github.com/Fieash/InternshipProject.git
 make
 ```
 
 ### Hidden module detection
+
+module_detection.c is a Loadable Kernel Module that detects hidden kernel modules in the system.
 ```
 sudo insmod module_detection.ko
 sudo rmmod module_detection.ko
@@ -34,6 +43,11 @@ dmesg
 An alternative to watch the output is to use tail -f /var/log/syslog
 
 ### Hidden process detection
+
+
+
+hidden_process_detection.c is a C program that outputs hidden PIDs to the console.
+With this, we are able to detect processes that are attempting to hide from the system.
 
 At line 46, modify the program according to your system's max PID found in 
 the /proc/sys/kernel/pid_max file.
@@ -55,6 +69,9 @@ sudo ./a.out
 ```
 
 ### Syscall hook detection
+
+syscall_detection.c is a Loadable Kernel Module that detects syscalls that have been hooked,
+displaying their names and numbers in the output.
 ```
 sudo insmod syscall_detection.ko
 sudo rmmod syscall_detection.ko
@@ -62,6 +79,8 @@ dmesg
 ```
 
 ### Interrupt hook detection
+
+interrupt_detection.c is a Loadable Kernel Module that detects interrupts that have been hooked.
 ```
 sudo insmod interrupt_detection.ko
 sudo rmmod interrupt_detection.ko
