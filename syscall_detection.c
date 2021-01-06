@@ -2,14 +2,9 @@
 #include <linux/module.h>
 #include <linux/version.h>
 #include <linux/kallsyms.h>
-#include <asm/asm-offsets.h> // to use NR_syscalls (number of system calls)
+#include <asm/asm-offsets.h> // NR_syscalls (number of system calls)
 
-#define TOTAL_INTERRUPTS 256;
-
-#define BETWEEN_PTR(x, y, z) ( \
-	((uintptr_t)x >= (uintptr_t)y) && \
-	((uintptr_t)x < ((uintptr_t)y+(uintptr_t)z)) \
-)
+#define BETWEEN_PTR(a, b, c) (	((uintptr_t)b <= (uintptr_t)a) && ((uintptr_t)a < ((uintptr_t)b+(uintptr_t)c))	)
 
 
 // syscall array definition
@@ -20,12 +15,12 @@ const char* syscall_names[] = {"read", "write", "open", "close", "stat", "fstat"
 // declare functions here
 void analyze_syscalls(void);
 void analyze_interrupts(void);
-const char *find_hidden_module(unsigned long addr);
+const char *find_hidden_module(unsigned long address);
 
 
 static int __init syscalls_init(void)
 {
-    printk(KERN_INFO "==== Start syscall detection app.\n");
+    printk(KERN_INFO "==== Start syscall/interrupt hook detection app.\n");
 	analyze_interrupts();
     analyze_syscalls();
     return 0;
@@ -34,19 +29,19 @@ static int __init syscalls_init(void)
 
 static void __exit syscalls_exit(void)
 {
-    printk(KERN_INFO "==== Exit syscall detection app.\n");
+    printk(KERN_INFO "==== Exit syscall/interrupt hook detection app.\n");
 }
 
 
 // Detect modules in the syscall table that aren't within the core kernel text section
 void analyze_syscalls(void){
 	int i;
-	const char *mod_name;
-	unsigned long addr;
-	struct module *mod;
+	const char *module_name;
+	unsigned long address;
+	struct module *module;
 
     unsigned long *sct; 			// Syscall Table
-    int (*ckt)(unsigned long addr); // Core Kernel Text
+    int (*ckt)(unsigned long address); // Core Kernel Text
 
 	sct = (void *)kallsyms_lookup_name("sys_call_table");
 	ckt = (void *)kallsyms_lookup_name("core_kernel_text");
@@ -54,37 +49,37 @@ void analyze_syscalls(void){
 	if (!sct || !ckt)
 		return;
 
-	printk(KERN_ALERT "SYSCALL START\n";
+	printk(KERN_ALERT "SYSCALL START\n");
 
 	for (i = 0; i < NR_syscalls; i++){
-		addr = sct[i];
-		if (!ckt(addr)){
+		address = sct[i];
+		if (!ckt(address)){
 			mutex_lock(&module_mutex);
-			mod = __module_address(addr);
-			if (mod){
-				printk(KERN_ALERT "Module [%s] hooked syscall [%d] [%s].\n", mod->name, i, syscall_names[i]);
+			module = __module_address(address);
+			if (module){
+				printk(KERN_ALERT "Module [%s] hooked syscall [%d] [%s].\n", module->name, i, syscall_names[i]);
 			} else {
-				mod_name = find_hidden_module(addr);
-				if (mod_name)
-					printk(KERN_ALERT "Hidden module [%s] hooked syscall [%d] [%s].\n", mod_name, i, syscall_names[i]);
+				module_name = find_hidden_module(address);
+				if (module_name)
+					printk(KERN_ALERT "Hidden module [%s] hooked syscall [%d] [%s].\n", module_name, i, syscall_names[i]);
 			}
 			mutex_unlock(&module_mutex);
 		}
 	}
 
-	printk(KERN_ALERT "SYSCALL END\n";
+	printk(KERN_ALERT "SYSCALL END\n");
 }
 
 
 // Detect interrupt handlers in the interrupt discriptor table that aren't within the core kernel text section
 void analyze_interrupts(void){
 	int i;
-	const char *mod_name;
-	unsigned long addr;
-	struct module *mod;
+	const char *module_name;
+	unsigned long address;
+	struct module *module;
 
     unsigned long *idt; 			// Interrupt Discriptor Table
-    int (*ckt)(unsigned long addr); // Core Kernel Text
+    int (*ckt)(unsigned long address); // Core Kernel Text
 
 	idt = (void *)kallsyms_lookup_name("idt_table");
 	ckt = (void *)kallsyms_lookup_name("core_kernel_text");
@@ -92,40 +87,40 @@ void analyze_interrupts(void){
 	if (!idt || !ckt)
 		return;
 
-	printk(KERN_ALERT "INTERRUPT START\n";
+	printk(KERN_ALERT "INTERRUPT START\n");
 
-	for (i = 0; i < TOTAL_INTERRUPTS; i++){
-		addr = idt[i];
-		if (!ckt(addr)){
+	for (i = 0; i < 256; i++){
+		address = idt[i];
+		if (!ckt(address)){
 			mutex_lock(&module_mutex);
-			mod = __module_address(addr);
-			if (mod){
-				printk(KERN_ALERT "Module [%s] hooked interrupt [%d].\n", mod->name, i);
+			module = __module_address(address);
+			if (module){
+				printk(KERN_ALERT "Module [%s] hooked interrupt [%d].\n", module->name, i);
 			} else {
-				mod_name = find_hidden_module(addr);
-				if (mod_name)
-					printk(KERN_ALERT "Hidden module [%s] hooked interrupt [%d].\n", mod_name, i);
+				module_name = find_hidden_module(address);
+				if (module_name)
+					printk(KERN_ALERT "Hidden module [%s] hooked interrupt [%d].\n", module_name, i);
 			}
 			mutex_unlock(&module_mutex);
 		}
 	}
 
-	printk(KERN_ALERT "INTERRUPT END\n";
+	printk(KERN_ALERT "INTERRUPT END\n");
 }
 
 
-// Used by analyze_syscalls() to return the name of the hidden module given their address
-const char *find_hidden_module(unsigned long addr){
-	const char *mod_name = NULL;
-	struct kset *mod_kset;
+// Return the name of a (hidden) module given its address
+const char *find_hidden_module(unsigned long address){
+	const char *module_name = NULL;
+	struct kset *module_kset;
 	struct kobject *cur, *tmp;
 	struct module_kobject *kobj;
 
-	mod_kset = (void *)kallsyms_lookup_name("module_kset");
-	if (!mod_kset)
+	module_kset = (void *)kallsyms_lookup_name("module_kset");
+	if (!module_kset)
 		return NULL;
 
-	list_for_each_entry_safe(cur, tmp, &mod_kset->list, entry){
+	list_for_each_entry_safe(cur, tmp, &module_kset->list, entry){
 		if (!kobject_name(tmp))
 			break;
 
@@ -134,17 +129,17 @@ const char *find_hidden_module(unsigned long addr){
 			continue;
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,4,0))
-		if (BETWEEN_PTR(addr, kobj->mod->core_layout.base, kobj->mod->core_layout.size)){
-			mod_name = kobj->mod->name;
+		if (BETWEEN_PTR(address, kobj->mod->core_layout.base, kobj->mod->core_layout.size)){
+			module_name = kobj->mod->name;
 		}
 #else
-		if (BETWEEN_PTR(addr, kobj->mod->module_core, kobj->mod->core_size)){
-			mod_name = kobj->mod->name;
+		if (BETWEEN_PTR(address, kobj->mod->module_core, kobj->mod->core_size)){
+			module_name = kobj->mod->name;
 		}
-#endif
+#endif 
 	}
 
-	return mod_name;
+	return module_name;
 }
 
 
