@@ -36,15 +36,16 @@ void printbadpid (int tmppid) ;
 void brute(int maxpid, int check);
 char * find_hidden_process_name(int hiddenPID);
 long int findSize(char file_name[]);
+int counter = 0;
 
 int main(int argc, char *argv[])
 {
-	printf("==== Start hidden process detection app.\n");
+	printf("==== Start hidden process detection app ====\n");
     // first parameter should be your system's max PID, 
 	// found at /proc/sys/kernel/pid_max
 	// 0 for a second check (leave it as 0)
 	brute(131072, 0);
-	printf("==== Exit hidden process detection app.\n");
+	printf("==== Exit hidden process detection app ====\n");
 	return 0;
 }
 
@@ -61,7 +62,7 @@ void brute(int maxpid, int check)
     int y;
     int z;
 
-    printf("==== Brute force PID scan with fork() range 301 to %d\n\n", maxpid);
+    printf("==== Brute force PID scan with fork() range 301 to %d ====\n\n", maxpid);
 
     // PID under 301 are reserved for kernel
 	// fill them up with zeros
@@ -117,6 +118,7 @@ void brute(int maxpid, int check)
             }
         }
     }
+
    /* processes that quit at this point in time create false positives */
    for(y=0; y < maxpid; y++) 
    {
@@ -130,15 +132,28 @@ void brute(int maxpid, int check)
         }
    }
 
+   	if (counter == 0) 
+	{
+		printf("Result: No hidden processes found.\n\n");
+	}
+	else
+	{
+		printf("Result: %d hidden process(es) found.\n\n", counter);
+	}
+
 }
 
 void printbadpid(int badPid)
 {
 	char * processName = "err";
 	processName = find_hidden_process_name(badPid);
-	if(processName != "fail" && processName != "nonExist"){
-		printf("Suspicious PID %d: %s\n", badPid, processName);
-	}else{
+	if(processName != "fail" && processName != "nonExist")
+	{
+		printf("Suspicious PID [%d]: %s\n", badPid, processName);
+		counter++;
+	}
+	else
+	{
 		//printf("process name is %s", processName); //debug
 	}
 		

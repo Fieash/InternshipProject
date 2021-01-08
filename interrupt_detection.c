@@ -13,7 +13,7 @@ const char *find_hidden_module(unsigned long address);
 
 static int __init interrupts_init(void)
 {
-    printk(KERN_INFO "==== Start interrupt hook detection app.\n");
+    printk(KERN_INFO "==== Start interrupt hook detection app ====\n");
 	analyze_interrupts();
     return 0;
 }
@@ -21,16 +21,18 @@ static int __init interrupts_init(void)
 
 static void __exit interrupts_exit(void)
 {
-    printk(KERN_INFO "==== Exit interrupt hook detection app.\n");
+    printk(KERN_INFO "==== Exit interrupt hook detection app ====\n");
 }
 
 
 // Detect interrupt handlers in the interrupt discriptor table that aren't within the core kernel text section
-void analyze_interrupts(void){
+void analyze_interrupts(void)
+{
 	int i;
 	const char *module_name;
 	unsigned long address;
 	struct module *module;
+	int counter = 0;
 
     unsigned long *idt; 			// Interrupt Discriptor Table
     int (*ckt)(unsigned long address); // Core Kernel Text
@@ -41,30 +43,45 @@ void analyze_interrupts(void){
 	if (!idt || !ckt)
 		return;
 
-	printk(KERN_ALERT "INTERRUPT START\n");
-
-	for (i = 0; i < 256; i++){
+	for (i = 0; i < 256; i++)
+	{
 		address = idt[i];
-		if (!ckt(address)){
+		if (!ckt(address))
+		{
 			mutex_lock(&module_mutex);
 			module = __module_address(address);
-			if (module){
+			if (module)
+			{
 				printk(KERN_ALERT "Module [%s] hooked interrupt [%d].\n", module->name, i);
-			} else {
+				counter++;
+			} 
+			else 
+			{
 				module_name = find_hidden_module(address);
 				if (module_name)
+				{
 					printk(KERN_ALERT "Hidden module [%s] hooked interrupt [%d].\n", module_name, i);
+					counter++;	
+				}
 			}
 			mutex_unlock(&module_mutex);
 		}
 	}
 
-	printk(KERN_ALERT "INTERRUPT END\n");
+	if (counter == 0) 
+	{
+		printk(KERN_ALERT "Result: No hooked interrupts found.\n");
+	}
+	else
+	{
+		printk(KERN_ALERT "Result: %d hooked interrupt(s) found.\n", counter);
+	}
 }
 
 
 // Return the name of a (hidden) module given its address
-const char *find_hidden_module(unsigned long address){
+const char *find_hidden_module(unsigned long address)
+{
 	const char *module_name = NULL;
 	struct kset *module_kset;
 	struct kobject *cur, *tmp;
@@ -74,7 +91,8 @@ const char *find_hidden_module(unsigned long address){
 	if (!module_kset)
 		return NULL;
 
-	list_for_each_entry_safe(cur, tmp, &module_kset->list, entry){
+	list_for_each_entry_safe(cur, tmp, &module_kset->list, entry)
+	{
 		if (!kobject_name(tmp))
 			break;
 
@@ -82,15 +100,17 @@ const char *find_hidden_module(unsigned long address){
 		if (!kobj || !kobj->mod)
 			continue;
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,4,0))
-		if (BETWEEN_PTR(address, kobj->mod->core_layout.base, kobj->mod->core_layout.size)){
-			module_name = kobj->mod->name;
-		}
-#else
-		if (BETWEEN_PTR(address, kobj->mod->module_core, kobj->mod->core_size)){
-			module_name = kobj->mod->name;
-		}
-#endif 
+	#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,4,0))
+			if (BETWEEN_PTR(address, kobj->mod->core_layout.base, kobj->mod->core_layout.size))
+			{
+				module_name = kobj->mod->name;
+			}
+	#else
+			if (BETWEEN_PTR(address, kobj->mod->module_core, kobj->mod->core_size))
+			{
+				module_name = kobj->mod->name;
+			}
+	#endif 
 	}
 
 	return module_name;
