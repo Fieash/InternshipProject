@@ -17,6 +17,15 @@ hidden_process_detection.c is a C program that outputs hidden PIDs to the consol
 
 The detection methods are adapted from the Tyton rootkit hunter https://github.com/nbulischeck/tyton.
 
+
+## Prerequisites
+```
+sudo apt update
+sudo apt install kmod linux-headers-$(uname -r)
+sudo apt install git
+sudo apt install build-essential
+```
+
 ## Installation
 ```
 git clone https://github.com/Fieash/InternshipProject.git
