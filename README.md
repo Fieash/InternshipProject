@@ -10,12 +10,12 @@ This tool was developed for educational purposes.
 - System call hook detection (syscall_detection.c)
 - Interrupt hook detection (interrupt_detection.c)
 
-module_detection.c, syscall_detection.c and interrupt_detection.c are Loadable Kernel Modules 
+```module_detection.c```, ```syscall_detection.c``` and ```interrupt_detection.c``` are Loadable Kernel Modules 
 that outputs their results to the system log. They can be read using the dmesg command.
 
-hidden_process_detection.c is a C program that outputs hidden PIDs to the console.
+```process_detection.c``` is a C program that outputs hidden PIDs to the console.
 
-The detection methods are adapted from the Tyton rootkit hunter https://github.com/nbulischeck/tyton.
+The detection methods were adapted from Tyton https://github.com/nbulischeck/tyton.
 
 
 ## Prerequisites
