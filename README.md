@@ -68,9 +68,8 @@ dmesg
 ## Detection Results
 
 ### Reptile
-It is able to detect the reptile module when it is hiding from the system,
-as well as processes hidden by Reptile.
+It is able to detect the reptile modul as well as processes hidden by Reptile.
 
 ### Diamorphine
-It is able to detect the diamorphine module as well as the system calls
-that Diamorphine hooks, which are kill, getdents, and getdents64. 
+It is able to detect the diamorphine module, processes hidden by Diamorphine as 
+well as system calls hooked by Diamorphine (kill, getdents, and getdents64). 
