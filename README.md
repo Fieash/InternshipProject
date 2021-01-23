@@ -38,7 +38,7 @@ sudo insmod module_detection.ko
 sudo rmmod module_detection.ko
 dmesg 
 ```
-An alternative to watch the output is to use tail -f /var/log/syslog
+An alternative to read the output: ```tail -f /var/log/syslog```
 
 ### Hidden process detection
 At line 46, modify the program according to your system's max PID found in 
