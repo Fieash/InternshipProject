@@ -42,7 +42,7 @@ An alternative to read the output: ```tail -f /var/log/syslog```
 
 ### Hidden process detection
 At line 46, modify the program according to your system's max PID found in 
-the /proc/sys/kernel/pid_max file.
+the ```/proc/sys/kernel/pid_max``` file.
 ```
 40    int main(int argc, char *argv[])
 41    {
@@ -77,7 +77,7 @@ dmesg
 ## Detection Results
 
 ### Reptile
-It is able to detect the reptile modul as well as processes hidden by Reptile.
+It is able to detect the reptile module as well as processes hidden by Reptile.
 
 ### Diamorphine
 It is able to detect the diamorphine module, processes hidden by Diamorphine as 
